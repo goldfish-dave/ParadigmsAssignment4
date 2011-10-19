@@ -1,0 +1,34 @@
+Installing Graph-Easy:
+=====================
+goto 
+	http://linuxgazette.net/139/okopnik.html
+
+This page is about installing perl modules as non-root user. Only follow the
+instructions down until the end of "Configuring the Environment". You can us
+e a location other than myperl if you want (I used .perllibs).
+
+Once you've done that install the Graph-Easy-0.70.tar.gz from
+	http://search.cpan.org/~shlomif/Graph-Easy/bin/graph-easy
+
+extract using
+	$ tar -xzf Graph-Easy-x.xx.tar.gz
+
+Instead of properly installing we'll just copy 
+	Graph-Easy/bin/graph-easy
+into
+	~/bin/.
+or somewhere else accessible from your PATH (alternatively you can add it to
+the .gitignore file and leave it in this directory).
+
+Also copy 
+	Graph-Easy/lib/Graph
+(and all of it's contents) into
+	the location you added to PERL5Lib previously.
+
+You should be able to test graph easy with this:
+	$ echo "[ Bonn ] - car -> [ Berlin ]" | graph-easy
+
+If it doesn't work, and the error message isn't obvious, try going through 
+all the steps you can on the first linked page, and run
+	$ perl Makefile.PL
+in the Graph-Easy directory.
