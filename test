@@ -1,0 +1,13 @@
+/*
+* @command = dot
+*
+*/
+digraph g {
+rankdir = LR
+a -> b ;
+a -> c ;
+a -> d ;
+a -> e;
+"a = 2" -> f;
+f -> a;
+} 
