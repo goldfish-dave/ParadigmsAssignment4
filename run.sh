@@ -11,3 +11,4 @@ touch ${BUILD_DIR}/__init__.py
 java -cp ${ANTLR_JAR} org.antlr.Tool -o ${BUILD_DIR} Jump.g
 
 PYTHONPATH=${ANTLR_JAR}:. python run.py ${1}
+a
