@@ -11,4 +11,6 @@ s = 0;
 	goto L1;
 
  L2:
+	goto L1;
+ L3:
 	return s;"""
