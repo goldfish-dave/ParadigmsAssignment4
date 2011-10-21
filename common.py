@@ -72,15 +72,20 @@ def parse(code): #takes in code, outputs the control flow graph in dictionary fo
 	"""
 	return tokens
 
-def optimisedCode(graph): #takes in the processed code, outputs as normal code (string) in sequential order
+def optimisedCode(graphDict): #takes in the processed code, outputs as normal code (string) in sequential order
+	graph = []
+	for node in graphDict:
+		graph += [node]
 
 	orderedLines = sorted(graph, key = lambda x : int(x.split()[0])) #sorts the code
 	unNumbered = map(lambda x : ' '.join(x.split()[1:]), orderedLines) #gets rid of line numbers added in processing
 	
 	if unNumbered[-1] == 'EOF': #special case for when the last line of the code gets optimised out, nothing points to EOF
 		unNumbered = unNumbered[:-1]
-	for line in range(len(unNumbered)):
+
+	for line in range(len(unNumbered)): #formatting rules
 		if unNumbered[line][-1] != ':':
 			unNumbered[line] += ';'
 			unNumbered[line] = ' ' + unNumbered[line]
+
 	return '\n'.join(unNumbered)

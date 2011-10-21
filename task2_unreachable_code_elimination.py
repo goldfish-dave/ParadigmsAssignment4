@@ -12,14 +12,20 @@ def trimNodes(graph): #removes all the nodes with no existing predecessors
 			reachable += [currentnode]
 			if currentnode in graph: #specialcase for EOF
 				nodeStack += graph[currentnode]
+	trimmedGraph = {}
 	
-	return reachable
+	for node in graph:
+		if node in reachable:
+			trimmedGraph[node] = graph[node]
+
+	return trimmedGraph
 
 if __name__ == "__main__":
 	graph = parse(testinput)
-	print testinput
-	print '------------------'
+#	print testinput
+#	print '------------------'
 	opt = trimNodes(graph)
-	print optimisedCode(opt)
-#	toDotFormat()
+#	print opt
+#	print optimisedCode(opt)
+	toDotFormat(opt)
 	
