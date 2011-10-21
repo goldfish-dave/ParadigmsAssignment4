@@ -22,10 +22,12 @@ def trimNodes(graph): #removes all the nodes with no existing predecessors
 
 if __name__ == "__main__":
 	graph = parse(testinput)
-#	print testinput
-#	print '------------------'
 	opt = trimNodes(graph)
-#	print opt
-#	print optimisedCode(opt)
+
+#	"""
+	print testinput
+	print '------------------'
+	print optimisedCode(opt)
+#	"""
 	toDotFormat(opt)
 	
