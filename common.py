@@ -18,12 +18,11 @@ def parse(code): #takes in code, outputs the control flow graph in dictionary fo
 		labelMatch[temptokens[token - 1].strip()] = lastadded
 	
 	mapping += [str(len(temptokens) + 1) + ' EOF']
-
+	
 	changes = True
 	while changes: #do until no more successors can be added to the token dictionary
 		changes = False
 		for token in tokens:
-
 			successor = mapping[int(token.split()[0])]
 
 			if token.split()[1] == 'goto': #for the case: "goto L1"
@@ -70,6 +69,10 @@ def parse(code): #takes in code, outputs the control flow graph in dictionary fo
 	for x in sorted(list(tokens)):
 		print x, '-->', tokens[x]
 	"""
+	for token in tokens: #ensures returns point to EOF
+		if token.split()[1] == 'return':
+			tokens[token] = [str(len(temptokens) + 1) + ' EOF']
+
 	return tokens
 
 def optimisedCode(graphDict): #takes in the processed code, outputs as normal code (string) in sequential order

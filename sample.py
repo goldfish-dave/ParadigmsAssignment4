@@ -28,6 +28,16 @@ s = 0;
 	goto L1;
 
  L2:
+	return s;
 	goto L1;
  L3:
 	return s;"""
+
+testinput2 = """
+
+s = 0;
+a = 1;
+
+b = s + a;
+
+"""
