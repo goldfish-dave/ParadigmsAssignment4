@@ -34,9 +34,16 @@ s = 0;
 	return s;"""
 
 testinput2 = """
+L1:
 
 s = 0;
 a = 1;
 
 b = s + a;
+
+t = t + b;
+
+goto L1;
 """
+
+#T mappings
