@@ -159,8 +159,6 @@ def processConstants(graph):
 
 def constantPropagation(variableEnvironment): #replaces variables with constants, returns code as a string
 	
-	for v in  variableEnvironment:
-		print v
 	code = []
 
 	for statement in variableEnvironment:
@@ -172,27 +170,28 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 				code += [statement]
 
 			elif currentState[tokens[2]] == True: #always true
-				code += [' '.join([statement.split()[0]] + statement.split()[3:])]
+				code += [' '.join([statement.split()[0]] + statement.split()[3:])] 
 
-			#else ignore line since it always evaluates to false
-		elif tokens[1] == 'return':
+			#else ignore line since it always evaluates to false, if b goto L1: -> ' ', where b is a constant mapping to False
+
+		elif tokens[1] == 'return': 
 			if currentState[tokens[2]] not in ['T', 'init']:
-				statement = ' '.join	(
-										tokens[:-1]
-										+ [str(currentState[tokens[2]])]
-										)
+				if currentState[tokens[2]] in [True, False]: #the return value can also be true/false as well as an integer
+					code += [statement] #return b -> return b, even if b is a constant boolean
+				else: #return x -> return 10, if x is a constant which maps to 10
+					statement = ' '.join	(
+											tokens[:-1]
+											+ [str(currentState[tokens[2]])]
+											)
 
-			code += [statement]
+					code += [statement]
 		
 		elif tokens[1] == 'goto' or statement[-1] == ':':
 			code += [statement]
 
 		else:
-
 			tokenPlace = 3
-
 			for token in tokens[3:]:
-
 #				print statement
 				if token in currentState:
 					if currentState[token] != 'T':

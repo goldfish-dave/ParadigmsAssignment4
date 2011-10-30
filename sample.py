@@ -61,7 +61,7 @@ b = a < 0;
 if b goto L1;
 
 c = 2;
-return b;
+return c;
 
 """
 
