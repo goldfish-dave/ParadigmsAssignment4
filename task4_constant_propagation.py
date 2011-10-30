@@ -11,11 +11,11 @@ def defaultVariables(graph, defaultValue): #returns a list of all the variables 
 	return variables
 
 def meet(env1, env2): #calculates the meet of 2 environment variables. x ^ x = x, x ^ y = T, T ^ x = T
-	newEnv = {}
+#	newEnv = {}
 	newEnv = env2
-
+#	print env1, env2
 	for variable in env1:
-		if str(env1[variable]) == str(env2[variable]) or env2[variable] == 'init':
+		if str(env1[variable]) == str(env2[variable]) or (env2[variable] == 'init' and env1[variable] != 'T'):
 			newEnv[variable] = env1[variable]
 		else:
 			newEnv[variable] = 'T'
@@ -72,6 +72,7 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 						return [(successor, newEnv)]
 
 		elif env[statement.split()[2]] == 'T' : #if condition cannot be evaluated then go to both
+			print "------"
 			newEnv[statement.split()[2]] = True
 			newEnvTrue = newEnv
 
@@ -79,12 +80,17 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 			newEnvFalse[statement.split()[2]] = False
 			for successor in graph[statement]:
 				succ = successor.split()
-				if int(succ[0]) + 1 == int(statement.split()[0]):
-					return	[
-							(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
-							, (getNextLine(sucessor, graph), newEnvFalse)
-							]
-
+				if int(succ[0]) == int(statement.split()[0]) + 1:
+					if succ[1] == 'goto' or successor[-1] == ':':
+						return	[
+								(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
+								, (getNextLine(sucessor, graph), newEnvFalse)
+								]
+					else:
+						return	[
+								(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
+								, (successor, newEnvFalse)
+								]
 		return None #'EOF' case
 ##############
 
@@ -138,7 +144,7 @@ def processConstants(graph):
 	while statementStack:
 		
 		currentStatement = statementStack.pop()
-#		print '--', currentStatement
+		print '--', currentStatement
 
 		transferFunc = currentStatement[0] #the current statement it's dealing with
 		mappings = currentStatement[1] #the variable environment passed from predeccessor
@@ -160,6 +166,9 @@ def processConstants(graph):
 def constantPropagation(variableEnvironment): #replaces variables with constants, returns code as a string
 	
 	code = []
+	
+	for v in sorted(variableEnvironment):
+		print v, variableEnvironment[v]
 
 	for statement in variableEnvironment:
 		
@@ -211,9 +220,10 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 #	print code	
 	return optimisedCode(code)
 if __name__ == "__main__":
-	graph = parse(testinput2)
-#	toDotFormat(parse(processConstants(graph)))
+	graph = parse(testinput3)
 	print processConstants(graph)
+#	toDotFormat(parse(processConstants(graph)))
+#	toDotFormat(parse(processConstants(graph)))
 
 #	print toDotFormat(processConstants(graph))
 #	print applyTransferFunction({'a' : 2, 'b' : 'T', 's' : 'T'}, '3 b = s + a', graph)
