@@ -177,8 +177,8 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 	
 	code = []
 	
-	for v in sorted(variableEnvironment):
-		print v, variableEnvironment[v]
+#	for v in sorted(variableEnvironment):
+#		print v, variableEnvironment[v]
 
 	for statement in variableEnvironment:
 		
@@ -229,10 +229,11 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 
 			code += [statement]		
 #	print code	
-	return optimisedCode(code)
+	return parse(optimisedCode(code))
 if __name__ == "__main__":
-	graph = parse(testinput3)
-	print processConstants(graph)
+	graph = parse(testinput2)
+	toDotFormat(processConstants(trimNodes(graph)))
+#	print optimisedCode(trimNodes(parse(processConstants(graph))))
 #	toDotFormat(parse(processConstants(graph)))
 #	toDotFormat(parse(processConstants(graph)))
 
