@@ -87,17 +87,4 @@ testinput3 = """
  L4:
  goto L2;
 """
-testinput3 = """
 
- i = 1;
- s = 0;
- b = i > 100;
- L1:
- b = i > 100;
- if b goto L2;
- s = s + i;
- i = i + 1;
- goto L1;
- L2:
- return s;
-"""

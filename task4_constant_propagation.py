@@ -12,7 +12,7 @@ def defaultVariables(graph, defaultValue): #returns a list of all the variables 
 
 def meet(env1, env2): #calculates the meet of 2 environment variables. x ^ x = x, x ^ y = T, T ^ x = T
 #	newEnv = {}
-	newEnv = env2
+	newEnv = copy.deepcopy(env2)
 #	print env1, env2
 	for variable in env1:
 		if str(env1[variable]) == str(env2[variable]) or (env2[variable] == 'init' and env1[variable] != 'T'):
@@ -53,7 +53,7 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 	newEnv = env		
 	
 	if statement.split()[1].lower() == 'return': #checks for return, return does not have anything following it
-		return None
+		return [(statement, env)]
 
 	if statement.split()[1].lower() == 'if':
 		if env[statement.split()[2]] == True: #if condition always maps to True then go to label
@@ -72,7 +72,6 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 						return [(successor, newEnv)]
 
 		elif env[statement.split()[2]] == 'T' : #if condition cannot be evaluated then go to both
-			print "------"
 			newEnv[statement.split()[2]] = True
 			newEnvTrue = newEnv
 
@@ -87,6 +86,12 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 								, (getNextLine(sucessor, graph), newEnvFalse)
 								]
 					else:
+#						print '----'
+#						print [
+#								(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
+#								, (successor, newEnvFalse)
+#								]
+
 						return	[
 								(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
 								, (successor, newEnvFalse)
@@ -124,7 +129,6 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 
 	if nextStatement.split()[1] == 'EOF': #special case for EOF
 		return None
-
 	return [(nextStatement, newEnv)]
 
 def processConstants(graph):
@@ -142,25 +146,31 @@ def processConstants(graph):
 		statementStack = [(orderedLines[0], defaultVariables(graph, 0))]
 	
 	while statementStack:
-		
+
 		currentStatement = statementStack.pop()
-		print '--', currentStatement
+#		print '--', currentStatement
 
 		transferFunc = currentStatement[0] #the current statement it's dealing with
 		mappings = currentStatement[1] #the variable environment passed from predeccessor
 
 		if mappings == currentEnvironment[transferFunc]: #terminating condition, no more changes can be made or if EOF is reached with no other statements
-			return constantPropagation(currentEnvironment)
+#			return constantPropagation(currentEnvironment)
+			continue
 		
 		meetResult = meet(mappings, currentEnvironment[transferFunc])
 #		print meetResult
 		newStatements = applyTransferFunction(copy.deepcopy(meetResult) , transferFunc, graph)
 
+
 		if newStatements: #doesn't add if it's EOF
-			currentEnvironment[transferFunc] = meetResult
-#			print currentEnvironment
-			statementStack += newStatements
-	
+			currentEnvironment[transferFunc] = meetResult #updates the environment variables for that particular line/statement
+
+			if newStatements[-1][0].split()[1] != 'return': #specific case for return values
+				statementStack += newStatements
+
+			else: #updates environment variables for the return line, but doesn't add it to the stack to be processed
+				currentEnvironment[newStatements[0][0]] = newStatements[0][1]
+
 	return constantPropagation(currentEnvironment)
 
 def constantPropagation(variableEnvironment): #replaces variables with constants, returns code as a string
@@ -194,7 +204,8 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 											)
 
 					code += [statement]
-		
+			else:
+				code += [statement]
 		elif tokens[1] == 'goto' or statement[-1] == ':':
 			code += [statement]
 
@@ -203,7 +214,7 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 			for token in tokens[3:]:
 #				print statement
 				if token in currentState:
-					if currentState[token] != 'T':
+					if currentState[token] not in ['T', 'init']:
 						#substitutes constant in for variable
 						statement = ' '.join	(
 												tokens[:tokenPlace] 
