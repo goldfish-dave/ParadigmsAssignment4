@@ -1,5 +1,6 @@
 from sample import *
 from task1_control_flow_graph import *
+from task2_unreachable_code_elimination import *
 
 def parse(code): #takes in code, outputs the control flow graph in dictionary form (provides a bridge for cases with goto's and labels)
 
@@ -76,6 +77,7 @@ def parse(code): #takes in code, outputs the control flow graph in dictionary fo
 	return tokens
 
 def optimisedCode(graphDict): #takes in the processed code, outputs as normal code (string) in sequential order
+	#graphDict = {line1 : followset2, line2 : followset2 etc.
 	graph = []
 	for node in graphDict:
 		graph += [node]

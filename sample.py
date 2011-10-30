@@ -34,16 +34,35 @@ s = 0;
 	return s;"""
 
 testinput2 = """
-L1:
-
-s = 0;
 a = 1;
 
-b = s + a;
+L1:
 
-t = t + b;
+a = a;
 
-goto L1;
+b = a > 0;
+if b goto L1;
+
+c = 2;
+return b;
+
+"""
+testinput2 = """
+a = 1 + 2;
+b = a + 1;
+a = b + 1;
+a = 10 * 2;
+a = a + 1;
+L1:
+
+a = a;
+
+b = a < 0;
+if b goto L1;
+
+c = 2;
+return b;
+
 """
 
-#T mappings
+

@@ -23,21 +23,72 @@ def meet(env1, env2): #calculates the meet of 2 environment variables. x ^ x = x
 	return newEnv
 
 def constantFolding(statement): #simplifies a statement using constant folding
-	pass
+#	print statement
+	RHS = statement.split()[3:]
+	LHS = statement.split()[:3]
+	operations = ['+', '-', '*', '/']
+	for token in RHS:
+		if not token.isdigit() and token not in operations:
+			return statement
+
+	return ' '.join(LHS) + ' ' + str(eval(' '.join(RHS)))	
 
 def getNextLine(statement, graph): #gets the next line the code should go to
+
+	if statement not in graph: #finds '<line> L1:' when given 'L1:'
+		for successor in graph:
+			if successor.split()[1] == statement:
+				statement = successor
+
 	for successor in graph[statement]:
 		succ = successor.split()
-		if succ[1] != 'goto' and succ[-1] != ':':
+		if succ[1] != 'goto' and successor[-1] != ':':
 			return successor
 
 def applyTransferFunction(env, statement, graph): #returns a list of the next statement(s) and environment to be evaluated with the new environment of variables
+	
+#	print env, statement
+	#case for return
 
-	#special case if
+	newEnv = env		
+	
+	if statement.split()[1].lower() == 'return': #checks for return, return does not have anything following it
+		return None
+
+	if statement.split()[1].lower() == 'if':
+		if env[statement.split()[2]] == True: #if condition always maps to True then go to label
+			newEnv[statement.split()[2]] = True
+			return[(getNextLine(statement.split()[4] + ':', graph), newEnv)]
+
+		elif env[statement.split()[2]] == False: #if condition always maps to False then go to next line
+			newEnv[statement.split()[2]] = False
+			for successor in graph[statement]: #gets the next line, skipping the goto
+				succ = successor.split()
+
+				if int(succ[0]) == int(statement.split()[0]) + 1: #manually scans for the next line
+					if succ[1] == 'goto' or successor[-1] == ':': #if it's a label or a goto, then jump to next possible line
+						return [(getNextLine(successor, graph), newEnv)]
+					else:
+						return [(successor, newEnv)]
+
+		elif env[statement.split()[2]] == 'T' : #if condition cannot be evaluated then go to both
+			newEnv[statement.split()[2]] = True
+			newEnvTrue = newEnv
+
+			newEnvFalse = copy.deepcopy(env)
+			newEnvFalse[statement.split()[2]] = False
+			for successor in graph[statement]:
+				succ = successor.split()
+				if int(succ[0]) + 1 == int(statement.split()[0]):
+					return	[
+							(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
+							, (getNextLine(sucessor, graph), newEnvFalse)
+							]
+
+		return None #'EOF' case
 ##############
 
 	operations = ['+', '-', '*', '/']
-	newEnv = env		
 	TMapping = False
 
 	if statement.split()[2] == '=': #handles '=' case
@@ -61,7 +112,8 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 	#applies the operation, if the variable doesn't map to T
 	if not TMapping:
 		newEnv[splitStatement[1]] = eval(''.join(splitStatement[3:]))
-		
+	
+#	print 'here', newEnv
 	nextStatement = getNextLine(statement, graph)
 
 	if nextStatement.split()[1] == 'EOF': #special case for EOF
@@ -86,7 +138,7 @@ def processConstants(graph):
 	while statementStack:
 		
 		currentStatement = statementStack.pop()
-#		print currentStatement
+#		print '--', currentStatement
 
 		transferFunc = currentStatement[0] #the current statement it's dealing with
 		mappings = currentStatement[1] #the variable environment passed from predeccessor
@@ -107,13 +159,64 @@ def processConstants(graph):
 
 def constantPropagation(variableEnvironment): #replaces variables with constants, returns code as a string
 	
-	for v in variableEnvironment:
-		print v, variableEnvironment[v]
+	for v in  variableEnvironment:
+		print v
+	code = []
 
+	for statement in variableEnvironment:
+		
+		currentState = variableEnvironment[statement]
+		tokens = statement.split()
+		if tokens[1] == 'if':
+			if currentState[tokens[2]] == 'T':
+				code += [statement]
 
+			elif currentState[tokens[2]] == True: #always true
+				code += [' '.join([statement.split()[0]] + statement.split()[3:])]
+
+			#else ignore line since it always evaluates to false
+		elif tokens[1] == 'return':
+			if currentState[tokens[2]] not in ['T', 'init']:
+				statement = ' '.join	(
+										tokens[:-1]
+										+ [str(currentState[tokens[2]])]
+										)
+
+			code += [statement]
+		
+		elif tokens[1] == 'goto' or statement[-1] == ':':
+			code += [statement]
+
+		else:
+
+			tokenPlace = 3
+
+			for token in tokens[3:]:
+
+#				print statement
+				if token in currentState:
+					if currentState[token] != 'T':
+						#substitutes constant in for variable
+						statement = ' '.join	(
+												tokens[:tokenPlace] 
+												+ [str(currentState[token])] 
+												+ tokens[tokenPlace + 1:]
+												)
+
+				tokenPlace += 1
+
+			#constant folding
+			statement = constantFolding(statement)
+
+			code += [statement]		
+#	print code	
+	return optimisedCode(code)
 if __name__ == "__main__":
 	graph = parse(testinput2)
-	processConstants(graph)
+#	toDotFormat(parse(processConstants(graph)))
+	print processConstants(graph)
+
+#	print toDotFormat(processConstants(graph))
 #	print applyTransferFunction({'a' : 2, 'b' : 'T', 's' : 'T'}, '3 b = s + a', graph)
 #	print meet({'a' : 'T', 'b' : 5}, {'a' : 3, 'b' : 5})	
 
