@@ -10,15 +10,13 @@ def defaultVariables(graph, defaultValue): #returns a list of all the variables 
 
 	return variables
 
-def meet(env1, env2):
+def meet(env1, env2): #calculates the meet of 2 environment variables. x ^ x = x, x ^ y = T, T ^ x = T
 	newEnv = {}
 	newEnv = env2
 
 	for variable in env1:
 		if str(env1[variable]) == str(env2[variable]) or env2[variable] == 'init':
 			newEnv[variable] = env1[variable]
-#		elif env2[variable] == 'init':
-#			newEnv[variable] = env1[variable]
 		else:
 			newEnv[variable] = 'T'
 
@@ -60,13 +58,13 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 
 			currentPos += 1
 
-		#applies the operation
+	#applies the operation, if the variable doesn't map to T
 	if not TMapping:
 		newEnv[splitStatement[1]] = eval(''.join(splitStatement[3:]))
 		
 	nextStatement = getNextLine(statement, graph)
 
-	if nextStatement.split()[1] == 'EOF':
+	if nextStatement.split()[1] == 'EOF': #special case for EOF
 		return None
 
 	return [(nextStatement, newEnv)]
