@@ -22,25 +22,28 @@ from common import *
 # on all lines and grouped in the function jump_elimination(graph).
 
 def jump_elimination(code):
+	code = optimized_code(code,useless_jump)
+	code = optimized_code(code,jump_to_jump)
+	code = optimized_code(code,cond_to_jump)
+	code = optimized_code(code,jump_to_cond)
+	# takes some code, eliminates the jumps, then outputs the new code
+	return code
+
+def optimized_code(code,optimization):
+	# this function will take an optimization and
+	# run it over the code, returning the new code
 	lines = code.split("\n")
 	lines = map(lambda xs: xs.strip(), lines)
 	lines = filter(lambda xs: len(xs) > 0, lines)
-
 	graph = parse(code)
 	optimizedCode = ""
 	ln = 1 # linenumber
 	for line in lines:
-		optimizedCode += optimized_line(graph,line,ln) + "\n"
+		newline = optimization(graph,line,ln)
+		optimizedCode += newline + "\n"
 		ln += 1
 	# takes some code, eliminates the jumps, then outputs the new code
 	return optimizedCode
-
-def optimized_line(graph,line,ln):
-	line = useless_jump(graph,line,ln)
-	#line = jump_to_jump(graph,line,ln)
-	#line = jump_to_cond(graph,line,ln)
-	line = cond_to_jump(graph,line,ln)
-	return line
 
 def jump_to_jump(graph,line,ln):
 	# A "jump_to_jump" optimization will match the template
@@ -51,7 +54,6 @@ def jump_to_jump(graph,line,ln):
 	if len(splitline) == 2 and splitline[0].lower() == "goto":
 		# from this point we know it's a goto line
 		# need to check if it's going to another goto
-		print line, ln
 		lineWithNumber = getLine(line,ln)
 		if lineWithNumber:
 			number = lineWithNumber.split()[0]
@@ -98,6 +100,23 @@ def useless_jump(graph,line,ln):
 	return line
 
 def cond_to_jump(graph,line,ln):
+	# A "cond_to_jump" is a conditional goto to another goto
+	# and will optimize to a conditional jump to the second goto
+	splitline = line.split()
+	if len(splitline) >= 4 and splitline[0].lower() == "if" and splitline[2].lower() == "goto":
+		# Then this is a conditional jump
+		# and we need to check if it's jumping to another jump
+		thisLine = getLine(line,ln)
+		# get the label linenumber
+		for target in graph[thisLine]:
+			if splitline[-1][:-1] == target.split()[-1][:-1]:
+				linenumber = target.split()[0]
+				break
+		# get the line after the label
+		for target in graph[thisLine]:
+			if target.split()[0] == str(1+int(linenumber)):
+				nextline = target
+		return " ".join(splitline[0:2]+nextline.split()[1:]) + ";"
 	return line
 
 def getCode(line):
@@ -111,8 +130,8 @@ def getLine(line,ln):
 
 
 if __name__ == "__main__":
-	print testinput5
+	print testinput3
 	print "******************"
-	optCode = jump_elimination(testinput5)
+	optCode = jump_elimination(testinput3)
 	print "******************"
 	print optCode

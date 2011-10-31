@@ -77,7 +77,7 @@ L1:
 a = a;
 goto L2;
 b = a < 0;
-if b goto L1;
+if b goto L2;
 
 c = 2;
 return c;
