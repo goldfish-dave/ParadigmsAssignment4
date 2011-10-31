@@ -23,50 +23,81 @@ from common import *
 
 def jump_elimination(code):
 	lines = code.split("\n")
+	lines = map(lambda xs: xs.strip(), lines)
+	lines = filter(lambda xs: len(xs) > 0, lines)
+
 	graph = parse(code)
-	optimizedCode = "\n".join([optimized_line(graph,line) for line in lines])
+	optimizedCode = ""
+	ln = 1 # linenumber
+	for line in lines:
+		optimizedCode += optimized_line(graph,line,ln) + "\n"
+		ln += 1
 	# takes some code, eliminates the jumps, then outputs the new code
 	return optimizedCode
 
-def optimized_line(graph,line):
-	opt0 = jump_to_jump(graph,line)
-	opt1 = jump_to_cond(graph,opt0)
-	opt2 = useless_jump(graph,opt1)
-	opt3 = cond_to_jump(graph,opt2)
-	return opt3
+def optimized_line(graph,line,ln):
+	line = useless_jump(graph,line,ln)
+	#line = jump_to_jump(graph,line,ln)
+	#line = jump_to_cond(graph,line,ln)
+	line = cond_to_jump(graph,line,ln)
+	return line
 
-def jump_to_jump(graph,line):
+def jump_to_jump(graph,line,ln):
 	# A "jump_to_jump" optimization will match the template
 	#	line = "goto LX", where LX is a Label
 	# and
 	#	"LX: \ngoto LY", where LY is a Label
-	
 	splitline = line.split()
 	if len(splitline) == 2 and splitline[0].lower() == "goto":
 		# from this point we know it's a goto line
 		# need to check if it's going to another goto
-		lineWithNumber = getLine(graph,line)
+		print line, ln
+		lineWithNumber = getLine(line,ln)
 		if lineWithNumber:
 			number = lineWithNumber.split()[0]
 			label = splitline[1]
-			print number, label
 			for l in graph[lineWithNumber]:
 				sl = l.split()
 				if len(sl) == 3 and sl[1].lower() == "goto":
 					optimizedLine = " ".join(["goto",sl[2]])+ ";"
-					print optimizedLine
 					return optimizedLine
-
-
 	return line
 
-def jump_to_cond(graph,line):
+def jump_to_cond(graph,line,ln):
+	# A "jump_to_cond" optimization iwll match the template
+	#	line = "goto LX"
+	# and
+	#	"LX: \nif expr goto LY"
+	# and make it
+	#	 "if expr goto LY"
+	splitline = line.split()
+	if len(splitline) == 2 and splitline[0].lower() == "goto":
+		# from this point we know it's a goto line
+		# need to check if it's going to an 'if expr goto LY'
+		lineWithNumber = getLine(line,ln)
+		if lineWithNumber:
+			number = lineWithNumber.split()[0]
+			label = splitline[1]
+			for l in graph[lineWithNumber]:
+				sl = l.split()
+				#TODO make this work on expressions properly
+				if sl[1].lower() == "if" and sl[3].lower() == "goto":
+					return " ".join(sl[1:]) + ";"
 	return line
 
-def useless_jump(graph,line):
+def useless_jump(graph,line,ln):
+	# A "useless_jump" is a jump that has a 'goto' that points 
+	# to the next line
+	splitline = line.split()
+	if len(splitline) == 2 and splitline[0].lower() == "goto":
+		thisLine = getLine(line,ln)
+		if thisLine:
+			for target in graph[thisLine]:
+				if target.split()[0] == str(ln+1):
+					return ""
 	return line
 
-def cond_to_jump(graph,line):
+def cond_to_jump(graph,line,ln):
 	return line
 
 def getCode(line):
@@ -75,21 +106,13 @@ def getCode(line):
 	# this function returns the code (strips the linenumber)
 	return " ".join(line.split()[1:])
 
-def getLine(graph,line):
-	# returns the first occurance of line in graph
-	for k in graph.keys():
-		#print str(" ".join(k.split()[1:])) + " AND " + str(line[:-1])
-		if " ".join(k.split()[1:]) == line[:-1]:
-			#print "MATCH: ", k
-			return k
-	return None
+def getLine(line,ln):
+	return str(ln) + " " + line[:-1] # strips a semicolon off the line
 
-def getLineByNumber(code,number):
-	return code.split("\n")[number]
 
 if __name__ == "__main__":
-	print testinput3
+	print testinput5
 	print "******************"
-	optCode = jump_elimination(testinput3)
+	optCode = jump_elimination(testinput5)
 	print "******************"
 	print optCode
