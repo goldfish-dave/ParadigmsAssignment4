@@ -143,3 +143,23 @@ goto L2;
 L2:
 	if b goto L1;
 """
+testinput6 = """
+a = 1 + 2;
+b = a + 1;
+a = b + 1;
+a = 10 * 2;
+a = a + 1;
+L1:
+
+a = a;
+goto L2;
+b = a < 0;
+if ( false ) goto L3;
+
+c = 2;
+goto L2;
+L2:
+	if b goto L1;
+L3:
+	goto L1;
+"""
