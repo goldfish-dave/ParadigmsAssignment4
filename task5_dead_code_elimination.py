@@ -1,5 +1,8 @@
 from common import *
 
+#TODO complete this task ...
+# currently dead_code_elimination is a computationally expensive null op
+
 # This section uses the fixed-point solution of the dead_code_elimination
 # algebraic relation:
 #	M(n)[x] = (x-kill(n)) ++ gen(n)
@@ -13,34 +16,29 @@ def dead_code_elimination(code):
 	# from the graph left over, recreate the code
 	graph = parse(code)
 	genkill = gen_kill(graph)
-	#for k in graph.keys():
-	#	if shouldKill(genkill[k]):
-	#		graph.pop(k)
+	for k in graph.keys():
+		if shouldKill(genkill[k]):
+			graph.pop(k)
 	code = recreate_code(graph)
 	return code
 
 def gen_kill(graph):
-	return {}
+	genkill = {}
+	for k in graph.keys():
+		genkill[k] = ([],[]) # (gen,kill)
+	return genkill
 
 def shouldKill(x):
-	pass
+	return False
 
 def recreate_code(graph):
-	return graph
-
-# env vars are {} containing
-# in and out sets
-def meet(u,v):
-	return u
-
-def equalSets(a,b):
-	# returns true if all elements of a are in b
-	# AND all elements of b are in a
-	if all([j in b for j in a]) and all([k in a for k in b]):
-		return True
-	else:
-		return False
+	num_line = [ (k.split()[0], " ".join(k.split()[1:])) for k in graph.keys() ]
+	sorted_num_line = sorted(num_line,key=lambda nl:int(nl[0]))
+	lines = "\n".join([line for (num,line) in sorted_num_line])
+	return lines
 
 if  __name__ == "__main__":
 	print testinput3
+	print "******"
 	print dead_code_elimination(testinput3)
+	print "******"
