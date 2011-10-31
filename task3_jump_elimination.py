@@ -117,7 +117,8 @@ def cond_to_jump(graph,line,ln):
 		for target in graph[thisLine]:
 			if target.split()[0] == str(1+int(linenumber)):
 				nextline = target
-		return " ".join(splitline[0:2]+nextline.split()[1:]) + ";"
+				if nextline.split()[-2] == "goto":
+					return " ".join(splitline[0:2]+nextline.split()[1:]) + ";"
 	return line
 
 def getCode(line):
@@ -131,8 +132,9 @@ def getLine(line,ln):
 
 
 if __name__ == "__main__":
-#	print testinput3
-#	print "******************"
-	optCode = jump_elimination(testinput3)
-#	print "******************"
-#	print optCode
+	inp = testin3
+	print inp
+	print "******************"
+	optCode = jump_elimination(inp)
+	print "******************"
+	print optCode
