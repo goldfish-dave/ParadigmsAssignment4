@@ -22,13 +22,9 @@ from common import *
 # on all lines and grouped in the function jump_elimination(graph).
 
 def jump_elimination(code):
-	print code
 	code = optimized_code(code,useless_jump)
-	print code
 	code = optimized_code(code,jump_to_jump)
-	print code
 	code = optimized_code(code,cond_to_jump)
-	print code
 	code = optimized_code(code,jump_to_cond)
 	# takes some code, eliminates the jumps, then outputs the new code
 	print code
@@ -41,7 +37,6 @@ def optimized_code(code,optimization):
 	lines = map(lambda xs: xs.strip(), lines)
 	lines = filter(lambda xs: len(xs) > 0, lines)
 	#print code
-	print lines
 	graph = parse(code)
 	optimizedCode = ""
 	ln = 1 # linenumber
@@ -110,8 +105,7 @@ def cond_to_jump(graph,line,ln):
 	# A "cond_to_jump" is a conditional goto to another goto
 	# and will optimize to a conditional jump to the second goto
 	splitline = line.split()
-	if len(splitline) >= 4 and splitline[0].lower() == "if" and "goto" in [x.lower() for x in splitline[2:]]:
-		print splitline
+	if len(splitline) >= 4 and splitline[0].lower() == "if" and splitline[2].lower() == "goto":
 		# Then this is a conditional jump
 		# and we need to check if it's jumping to another jump
 		thisLine = getLine(line,ln)
