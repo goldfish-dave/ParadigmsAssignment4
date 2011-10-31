@@ -27,7 +27,7 @@ def jump_elimination(code):
 	code = optimized_code(code,cond_to_jump)
 	code = optimized_code(code,jump_to_cond)
 	# takes some code, eliminates the jumps, then outputs the new code
-	print code
+	#print code
 	return parse(code)
 
 def optimized_code(code,optimization):

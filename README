@@ -11,7 +11,7 @@ common.py contains common functions used by all tasks, as well as utility functi
 
 Task1 outputs a graph in DOT format, we used graph-easy to run it from the command line (see below for installation)
 
-Task5 is as 1.5 hours before due time, incomplete.
+Task5 is not completely implemented. There some skeleton code that demonstrates some of the logic the task would require, but the code it output is equivalent to the code input.
 
 Task6 has a optional debug argument which can be used to make each step of the optimisation print. It uses a simple hill climbing algorithm to know when to stop processing code.
 
