@@ -104,6 +104,7 @@ if b goto L2;
 c = 2;
 return c;
 L2:
+	return a;
 	goto L1;
 """
 

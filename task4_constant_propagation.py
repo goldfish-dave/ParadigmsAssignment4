@@ -1,4 +1,6 @@
 from common import *
+from task1_control_flow_graph import *
+from task2_unreachable_code_elimination import *
 import copy
 
 def defaultVariables(graph, defaultValue): #returns a list of all the variables used in the code, initialises them to be == 0
@@ -231,7 +233,7 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 #	print code	
 	return parse(optimisedCode(code))
 if __name__ == "__main__":
-	graph = parse(testinput2)
+	graph = parse(testinput3)
 	toDotFormat(processConstants(trimNodes(graph)))
 #	print optimisedCode(trimNodes(parse(processConstants(graph))))
 #	toDotFormat(parse(processConstants(graph)))

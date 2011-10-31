@@ -24,14 +24,14 @@ def	optimiseAll(graph):
 	
 	print 'optimising jumps'
 	task3 = jump_elimination(task2)
-#	task3 = task2
+#	task3 = parse(task2)
 	print task3
 	print 
 	print '-------------------------------'
 
 	print 'constant propagation and folding'
 	task4 = processConstants(task3)
-	print optimisedCode(task3)
+	print optimisedCode(task4)
 	print
 
 	print '-------------------------------'
@@ -41,4 +41,4 @@ def	optimiseAll(graph):
 	print '-------------------------------'
 
 if __name__ == "__main__":
-	optimiseAll(parse(testinput))
+	optimiseAll(parse(testinput2))
