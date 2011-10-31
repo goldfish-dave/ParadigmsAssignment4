@@ -35,6 +35,7 @@ def optimized_code(code,optimization):
 	lines = code.split("\n")
 	lines = map(lambda xs: xs.strip(), lines)
 	lines = filter(lambda xs: len(xs) > 0, lines)
+	print code
 	graph = parse(code)
 	optimizedCode = ""
 	ln = 1 # linenumber
