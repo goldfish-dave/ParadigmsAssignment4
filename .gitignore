@@ -3,3 +3,4 @@ build
 Graph-Easy-0.70
 run.sh
 *.pyc
+*.swp
