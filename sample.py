@@ -182,3 +182,12 @@ L2:
 
 return a;
 """
+
+testinput12 = """
+
+a = 0;
+if a goto L1;
+L1:
+return a;
+
+"""

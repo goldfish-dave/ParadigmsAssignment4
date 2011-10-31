@@ -54,11 +54,11 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 
 	if statement.split()[1].lower() == 'if':
 		if env[statement.split()[2]] == True: #if condition always maps to True then go to label
-			newEnv[statement.split()[2]] = True
-			return[(getNextLine(statement.split()[4] + ':', graph), newEnv)]
+#			newEnv[statement.split()[2]] = True
+			return [(getNextLine(statement.split()[4] + ':', graph), newEnv)]
 
 		elif env[statement.split()[2]] == False: #if condition always maps to False then go to next line
-			newEnv[statement.split()[2]] = False
+#			newEnv[statement.split()[2]] = False
 			for successor in graph[statement]: #gets the next line, skipping the goto
 				succ = successor.split()
 
