@@ -1,3 +1,20 @@
+ANTLR was not used because I didn't read the assignment sheet until it was too late, so the whole program is implemented in python.
+
+sample.py contains various sample inputs we used.
+
+Instead of run.sh and run.py calling everything, codeReader.py should be run.
+codeReader.py runs off sample.py if no argument is provided, otherwise it passes the code, from the file (given by the argument), into task6.
+
+Each task has samples of how to use the functions in the main.
+
+common.py contains common functions used by all tasks, as well as utility functions i.e. converting from our processing format to plain code and visa versa
+
+Task1 outputs a graph in DOT format, we used graph-easy to run it from the command line (see below for installation)
+
+Task5 is as 1.5 hours before due time, incomplete.
+
+Task6 has a optional debug argument which can be used to make each step of the optimisation print. It uses a simple hill climbing algorithm to know when to stop processing code.
+
 Installing Graph-Easy:
 =====================
 goto 

@@ -88,7 +88,7 @@ testinput3 = """
  goto L2;
 """
 
-testinput3 = """
+testinput10 = """
 a = 1 + 2;
 b = a + 1;
 a = b + 1;
@@ -143,4 +143,23 @@ c = 2;
 goto L2;
 L2:
 	if b goto L1;
+"""
+
+testinput11 = """
+c = 2;
+L1:
+
+c = c + 1;
+b = c < 100;
+
+if b goto L1;
+a = 1;
+b = a > 0;
+if b goto L2;
+
+return c;
+L2:
+
+return a;
+
 """
