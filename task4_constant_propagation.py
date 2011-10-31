@@ -45,6 +45,8 @@ def getNextLine(statement, graph): #gets the next line the code should go to
 			return successor
 
 def applyTransferFunction(env, statement, graph): #returns a list of the next statement(s) and environment to be evaluated with the new environment of variables
+	#each block of if statements can be considered seperate
+
 	newEnv = env		
 	
 	if statement.split()[1].lower() == 'return': #checks for return, return does not have anything following it
@@ -116,18 +118,19 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 
 	if nextStatement.split()[1] == 'EOF': #special case for EOF
 		return None
+
 	return [(nextStatement, newEnv)]
 
-def processConstants(graph):
+def processConstants(graph): #processes all statements until no more changes can be made
 	valueMap = {}
 	orderedLines = sorted(graph, key = lambda x : int(x.split()[0])) #sorts the code
-	
 	currentEnvironment = {}
 	default = defaultVariables(graph, 'init')
+
 	for node in graph: #initalises each statement to map to blank environment
 		currentEnvironment[node] = copy.deepcopy(default)
 
-	if orderedLines[0][-1] == ':':
+	if orderedLines[0][-1] == ':': #special case when the first line is a label
 		statementStack = [(getNextLine(orderedLines[0], graph), defaultVariables(graph, 0))]
 	else:
 		statementStack = [(orderedLines[0], defaultVariables(graph, 0))]
@@ -158,13 +161,12 @@ def processConstants(graph):
 	return constantPropagation(currentEnvironment)
 
 def constantPropagation(variableEnvironment): #replaces variables with constants, returns code as a string
-	
 	code = []
 	for statement in variableEnvironment:
 		
 		currentState = variableEnvironment[statement]
 		tokens = statement.split()
-		if tokens[1] == 'if':
+		if tokens[1] == 'if': #case for 'if', if b goto L1: -> if b goto L1: (b = 'T') the other 2 cases causes simple jump optimisation to occur
 			if currentState[tokens[2]] == 'T':
 				code += [statement]
 
@@ -193,7 +195,7 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 		elif tokens[1] == 'goto' or statement[-1] == ':':
 			code += [statement]
 
-		else:
+		else: #default case, for lines such as x = 1 or x = a -> x = 2 (a = 2)
 			tokenPlace = 3
 			for token in tokens[3:]:
 				if token in currentState:
@@ -209,9 +211,10 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 
 			#constant folding
 			statement = constantFolding(statement)
+			code += [statement]
 
-			code += [statement]		
 	return parse(optimisedCode(code))
+
 if __name__ == "__main__":
 	graph = parse(testinput10)
 	print 'original code'
