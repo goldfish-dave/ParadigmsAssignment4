@@ -1,6 +1,9 @@
 from sample import *
-from task1_control_flow_graph import *
-from task2_unreachable_code_elimination import *
+#from task1_control_flow_graph import *
+#from task2_unreachable_code_elimination import *
+#from task3_jump_elimination import *
+#from task4_constant_propagation import *
+#from task6_integration_of_optimisation import *
 
 def parse(code): #takes in code, outputs the control flow graph in dictionary form (provides a bridge for cases with goto's and labels)
 
@@ -94,3 +97,5 @@ def optimisedCode(graphDict): #takes in the processed code, outputs as normal co
 			unNumbered[line] = ' ' + unNumbered[line]
 
 	return '\n'.join(unNumbered)
+
+

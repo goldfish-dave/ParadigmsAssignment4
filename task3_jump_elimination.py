@@ -27,7 +27,7 @@ def jump_elimination(code):
 	code = optimized_code(code,cond_to_jump)
 	code = optimized_code(code,jump_to_cond)
 	# takes some code, eliminates the jumps, then outputs the new code
-	return code
+	return parse(code)
 
 def optimized_code(code,optimization):
 	# this function will take an optimization and
@@ -130,8 +130,8 @@ def getLine(line,ln):
 
 
 if __name__ == "__main__":
-	print testinput3
-	print "******************"
+#	print testinput3
+#	print "******************"
 	optCode = jump_elimination(testinput3)
-	print "******************"
-	print optCode
+#	print "******************"
+#	print optCode

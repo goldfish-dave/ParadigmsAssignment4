@@ -22,7 +22,7 @@ def trimNodes(graph): #removes all the nodes with no existing predecessors
 
 if __name__ == "__main__":
 #	graph = parse(testinput)
-	graph = parse(testinput3)
+	graph = testinput3
 	opt = trimNodes(graph)
 #	print optimisedCode(opt)
 	"""
