@@ -1,4 +1,6 @@
 from common import *
+from task1_control_flow_graph import *
+from task2_unreachable_code_elimination import *
 import copy
 
 def defaultVariables(graph, defaultValue): #returns a list of all the variables used in the code, initialises them to be == 0
@@ -11,9 +13,7 @@ def defaultVariables(graph, defaultValue): #returns a list of all the variables 
 	return variables
 
 def meet(env1, env2): #calculates the meet of 2 environment variables. x ^ x = x, x ^ y = T, T ^ x = T
-#	newEnv = {}
 	newEnv = copy.deepcopy(env2)
-#	print env1, env2
 	for variable in env1:
 		if str(env1[variable]) == str(env2[variable]) or (env2[variable] == 'init' and env1[variable] != 'T'):
 			newEnv[variable] = env1[variable]
@@ -23,7 +23,6 @@ def meet(env1, env2): #calculates the meet of 2 environment variables. x ^ x = x
 	return newEnv
 
 def constantFolding(statement): #simplifies a statement using constant folding
-#	print statement
 	RHS = statement.split()[3:]
 	LHS = statement.split()[:3]
 	operations = ['+', '-', '*', '/']
@@ -46,9 +45,7 @@ def getNextLine(statement, graph): #gets the next line the code should go to
 			return successor
 
 def applyTransferFunction(env, statement, graph): #returns a list of the next statement(s) and environment to be evaluated with the new environment of variables
-	
-#	print env, statement
-	#case for return
+	#each block of if statements can be considered seperate
 
 	newEnv = env		
 	
@@ -86,18 +83,11 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 								, (getNextLine(sucessor, graph), newEnvFalse)
 								]
 					else:
-#						print '----'
-#						print [
-#								(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
-#								, (successor, newEnvFalse)
-#								]
-
 						return	[
 								(getNextLine(statement.split()[4] + ':', graph), newEnvTrue)
 								, (successor, newEnvFalse)
 								]
 		return None #'EOF' case
-##############
 
 	operations = ['+', '-', '*', '/']
 	TMapping = False
@@ -124,23 +114,23 @@ def applyTransferFunction(env, statement, graph): #returns a list of the next st
 	if not TMapping:
 		newEnv[splitStatement[1]] = eval(''.join(splitStatement[3:]))
 	
-#	print 'here', newEnv
 	nextStatement = getNextLine(statement, graph)
 
 	if nextStatement.split()[1] == 'EOF': #special case for EOF
 		return None
+
 	return [(nextStatement, newEnv)]
 
-def processConstants(graph):
+def processConstants(graph): #processes all statements until no more changes can be made
 	valueMap = {}
 	orderedLines = sorted(graph, key = lambda x : int(x.split()[0])) #sorts the code
-	
 	currentEnvironment = {}
 	default = defaultVariables(graph, 'init')
+
 	for node in graph: #initalises each statement to map to blank environment
 		currentEnvironment[node] = copy.deepcopy(default)
 
-	if orderedLines[0][-1] == ':':
+	if orderedLines[0][-1] == ':': #special case when the first line is a label
 		statementStack = [(getNextLine(orderedLines[0], graph), defaultVariables(graph, 0))]
 	else:
 		statementStack = [(orderedLines[0], defaultVariables(graph, 0))]
@@ -148,17 +138,14 @@ def processConstants(graph):
 	while statementStack:
 
 		currentStatement = statementStack.pop()
-#		print '--', currentStatement
 
 		transferFunc = currentStatement[0] #the current statement it's dealing with
 		mappings = currentStatement[1] #the variable environment passed from predeccessor
 
 		if mappings == currentEnvironment[transferFunc]: #terminating condition, no more changes can be made or if EOF is reached with no other statements
-#			return constantPropagation(currentEnvironment)
 			continue
 		
 		meetResult = meet(mappings, currentEnvironment[transferFunc])
-#		print meetResult
 		newStatements = applyTransferFunction(copy.deepcopy(meetResult) , transferFunc, graph)
 
 
@@ -174,17 +161,12 @@ def processConstants(graph):
 	return constantPropagation(currentEnvironment)
 
 def constantPropagation(variableEnvironment): #replaces variables with constants, returns code as a string
-	
 	code = []
-	
-#	for v in sorted(variableEnvironment):
-#		print v, variableEnvironment[v]
-
 	for statement in variableEnvironment:
 		
 		currentState = variableEnvironment[statement]
 		tokens = statement.split()
-		if tokens[1] == 'if':
+		if tokens[1] == 'if': #case for 'if', if b goto L1: -> if b goto L1: (b = 'T') the other 2 cases causes simple jump optimisation to occur
 			if currentState[tokens[2]] == 'T':
 				code += [statement]
 
@@ -193,9 +175,13 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 
 			#else ignore line since it always evaluates to false, if b goto L1: -> ' ', where b is a constant mapping to False
 
-		elif tokens[1] == 'return': 
+		elif tokens[1] == 'return':
+			if tokens[2].isdigit():
+				code += [statement]
+				continue
+
 			if currentState[tokens[2]] not in ['T', 'init']:
-				if currentState[tokens[2]] in [True, False]: #the return value can also be true/false as well as an integer
+				if type(currentState[tokens[2]]) is type(bool()): #the return value can also be true/false as well as an integer
 					code += [statement] #return b -> return b, even if b is a constant boolean
 				else: #return x -> return 10, if x is a constant which maps to 10
 					statement = ' '.join	(
@@ -209,10 +195,9 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 		elif tokens[1] == 'goto' or statement[-1] == ':':
 			code += [statement]
 
-		else:
+		else: #default case, for lines such as x = 1 or x = a -> x = 2 (a = 2)
 			tokenPlace = 3
 			for token in tokens[3:]:
-#				print statement
 				if token in currentState:
 					if currentState[token] not in ['T', 'init']:
 						#substitutes constant in for variable
@@ -226,13 +211,23 @@ def constantPropagation(variableEnvironment): #replaces variables with constants
 
 			#constant folding
 			statement = constantFolding(statement)
+			code += [statement]
 
-			code += [statement]		
-#	print code	
 	return parse(optimisedCode(code))
+
 if __name__ == "__main__":
-	graph = parse(testinput2)
-	toDotFormat(processConstants(trimNodes(graph)))
+	graph = parse(testinput10)
+	print 'original code'
+	print optimisedCode(graph)
+	print
+
+	print 'constant propgation and folding'
+	temp = processConstants(graph)
+	print optimisedCode(temp)
+
+#	print optimisedCode(processConstants(temp))
+#	processConstants(processConstants(trimNodes(graph)))
+#	toDotFormat(processConstants(processConstants(processConstants(trimNodes(graph)))))
 #	print optimisedCode(trimNodes(parse(processConstants(graph))))
 #	toDotFormat(parse(processConstants(graph)))
 #	toDotFormat(parse(processConstants(graph)))

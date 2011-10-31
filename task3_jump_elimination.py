@@ -36,7 +36,6 @@ def optimized_code(code,optimization):
 	lines = code.split("\n")
 	lines = map(lambda xs: xs.strip(), lines)
 	lines = filter(lambda xs: len(xs) > 0, lines)
-	#print code
 	graph = parse(code)
 	optimizedCode = ""
 	ln = 1 # linenumber
@@ -139,7 +138,6 @@ if __name__ == "__main__":
 	#inp = testinput4
 	#inp = testinput5
 	inp = testinput6
-
 	print inp
 	print "******************"
 	optCode = jump_elimination(inp)
