@@ -27,7 +27,6 @@ def jump_elimination(code):
 	code = optimized_code(code,cond_to_jump)
 	code = optimized_code(code,jump_to_cond)
 	# takes some code, eliminates the jumps, then outputs the new code
-	print code
 	return parse(code)
 
 def optimized_code(code,optimization):
@@ -118,11 +117,11 @@ def cond_to_jump(graph,line,ln):
 			if target.split()[0] == str(1+int(linenumber)):
 				nextline = target
 				if nextline.split()[-2] == "goto":
-					return " ".join(splitline[0:2]+nextline.split()[1:]) + ";"
+					optimizedLine = " ".join(["if",splitline[1],"goto",nextline.split()[-1]]) + ";"
+					return optimizedLine
 	return line
 
 def getCode(line):
-	print splitline
 	# the code is stored as a string with the line number at the head.
 	# this function returns the code (strips the linenumber)
 	return " ".join(line.split()[1:])
@@ -134,12 +133,13 @@ def getLine(line,ln):
 if __name__ == "__main__":
 	#inp = testinput
 	#inp = testinput2
-	#inp = testinput3
+	inp = testinput3
 	#inp = testinput4
 	#inp = testinput5
-	inp = testinput6
+	#inp = testinput6
 	print inp
 	print "******************"
 	optCode = jump_elimination(inp)
+	optCode = jump_elimination(optimisedCode(optCode))
 	print "******************"
-	print optCode
+	print optimisedCode(optCode)
