@@ -23,4 +23,5 @@ rankdir = LR"""
 	print "}"
 
 if __name__ == "__main__":
-	toDotFormat(parse(testinput))
+#	toDotFormat(parse(testinput))
+	toDotFormat(parse(testinput3))

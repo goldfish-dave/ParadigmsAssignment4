@@ -65,6 +65,28 @@ return c;
 
 """
 
+testinput3 = """
+
+ i = 1;
+ s = 0;
+ b = i > 100;
+ L1:
+ b = i > 100;
+ if b goto L2;
+ s = s + i;
+ i = i + 1;
+ goto L1;
+ L2:
+ return s;
+ a = 3;
+ if a goto L3;
+ L3:
+ if a goto L4;
+ a = a - 1;
+ goto L3;
+ L4:
+ goto L2;
+"""
 
 testinput3 = """
 a = 1 + 2;

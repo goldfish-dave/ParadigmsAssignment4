@@ -21,13 +21,14 @@ def trimNodes(graph): #removes all the nodes with no existing predecessors
 	return trimmedGraph
 
 if __name__ == "__main__":
-	graph = parse(testinput)
+#	graph = parse(testinput)
+	graph = parse(testinput3)
 	opt = trimNodes(graph)
-
-#	"""
+#	print optimisedCode(opt)
+	"""
 	print testinput
 	print '------------------'
 	print optimisedCode(opt)
-#	"""
+	"""
 	toDotFormat(opt)
 	
